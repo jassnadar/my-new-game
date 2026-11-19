@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Endless Typing Game</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: #101827;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.game {
+    width: 100%;
+    max-width: 650px;
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 35px #0005;
+}
+
+h1 {
+    color: #38e28a;
+}
+
+.keys {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.key {
+    width: 55px;
+    height: 65px;
+    background: #334155;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.key.active {
+    background: #16a34a;
+    transform: translateY(-5px);
+}
+
+.sequence {
+    background: #0f172a;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 27px;
+    letter-spacing: 5px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    min-height: 90px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 25px 0;
+}
+
+.stats h2 {
+    color: #38e28a;
+}
+
+button {
+    border: none;
+    padding: 13px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.start {
+    background: #16a34a;
+    color: white;
+}
+
+.reset {
+    background: #475569;
+    color: white;
+}
+
+#status {
+    color: #38e28a;
+    margin-top: 15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <h1>ENDLESS TYPING GAME</h1>
+    <p>Practice only these 8 keys</p>
+
+    <div class="keys" id="keyboard">
+        <div class="key">a</div>
+        <div class="key">s</div>
+        <div class="key">d</div>
+        <div class="key">f</div>
+        <div class="key">;</div>
+        <div class="key">l</div>
+        <div class="key">k</div>
+        <div class="key">j</div>
+    </div>
+
+    <div class="sequence" id="sequence">
+        a s d f ; l k j
+    </div>
+
+    <div class="stats">
+        <div>
+            <h2 id="correct">0</h2>
+            <p>Correct</p>
+        </div>
+
+        <div>
+            <h2 id="mistakes">0</h2>
+            <p>Mistakes</p>
+        </div>
+
+        <div>
+            <h2 id="accuracy">100%</h2>
+            <p>Accuracy</p>
+        </div>
+    </div>
+
+    <button class="start" onclick="startGame()">
+        START
+    </button>
+
+    <button class="reset" onclick="resetGame()">
+        RESET
+    </button>
+
+    <p id="status">Press START to begin</p>
+
+</div>
+
+<script>
+
+const sequence = "asdf;lkj";
+
+let position = 0;
+let correct = 0;
+let mistakes = 0;
+let started = false;
+
+const keys = document.querySelectorAll(".key");
+
+function updateKeyboard() {
+    keys.forEach((key, index) => {
+        key.classList.toggle(
+            "active",
+            index === position % 8
+        );
+    });
+}
+
+function updateStats() {
+    const total = correct + mistakes;
+
+    const accuracy = total === 0
+        ? 100
+        : Math.round((correct / total) * 100);
+
+    document.getElementById("correct").textContent = correct;
+    document.getElementById("mistakes").textContent = mistakes;
+    document.getElementById("accuracy").textContent =
+        accuracy + "%";
+}
+
+function startGame() {
+    started = true;
+    document.getElementById("status").textContent =
+        "Keep typing the repeating sequence!";
+    updateKeyboard();
+}
+
+function resetGame() {
+    position = 0;
+    correct = 0;
+    mistakes = 0;
+    started = false;
+
+    document.getElementById("sequence").textContent =
+        "a s d f ; l k j";
+
+    document.getElementById("status").textContent =
+        "Press START to begin";
+
+    updateStats();
+    updateKeyboard();
+}
+
+document.addEventListener("keydown", function(event) {
+
+    if (!started) return;
+
+    const key = event.key.toLowerCase();
+
+    // Ignore keys outside the allowed 8 characters
+    if (!sequence.includes(key)) return;
+
+    event.preventDefault();
+
+    if (key === sequence[position % 8]) {
+        correct++;
+        position++;
+
+        document.getElementById("sequence").textContent =
+            sequence.split("").join(" ") +
+            "   " +
+            sequence.split("").join(" ");
+
+    } else {
+        mistakes++;
+    }
+
+    updateStats();
+    updateKeyboard();
+
+});
+
+updateStats();
+updateKeyboard();
+
+</script>
+
+</body>
+</html>
